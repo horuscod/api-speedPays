@@ -9,13 +9,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
 app.use(cors());
 
-app.set('trust proxy', true);
+app.set('trust proxy', 1);
 
 const allowedIps = ["123.45.67.89", "98.76.54.32"];
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
+  keyGenerator: (req, res) => {
+    return req.headers['x-real-ip'] || req.ip;
+  },
   skip: function (req, res) {
     return allowedIps.includes(req.ip);
   },
