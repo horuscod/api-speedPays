@@ -1,0 +1,30 @@
+{
+  "name": "checkout-proprio",
+  "version": "1.0.0",
+  "description": "Checkout para processar PIX gerado pela Arkama",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Checkout",
+    "PIX",
+    "Estrutura",
+    "de",
+    "pagamentos",
+    "Pagamento",
+    "Online"
+  ],
+  "author": "Otávio Prosperus",
+  "license": "ISC",
+  "dependencies": {
+    "api": "^6.1.1",
+    "axios": "^1.6.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "firebase-admin": "^12.0.0",
+    "helmet": "^7.1.0"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "id": "OR9GU6QEN9WD",
+  "status": "PENDING",
+  "value": 1,
+  "paymentMethod": "PIX",
+  "installments": null,
+  "subscription": null,
+  "customer": {
+    "id": "CTC617TF3CQFLV",
+    "name": "otavio",
+    "email": "otavioprosperus@gmail.com",
+    "cellphone": "(16)99750-5927",
+    "document": "47305189855"
+  },
+  "shipping": {
+    "address": {
+      "cep": null,
+      "city": null,
+      "state": null,
+      "street": null,
+      "neighborhood": null,
+      "number": null,
+      "complement": null
+    }
+  },
+  "pix": {
+    "payload": "00020101021226830014br.gov.bcb.pix2561api.pagseguro.com/pix/v2/ACBA4251-A807-45D2-B0D4-C116B6BD17B527600016BR.COM.PAGSEGURO0136ACBA4251-A807-45D2-B0D4-C116B6BD17B552047372530398654041.005802BR5922ABMEX PAGAMENTOS INTEL6009Sao Paulo62070503***6304609F"
+  },
+  "items": [
+    {
+      "productId": "PRYLONXSMCB",
+      "title": "Produto teste Otavio",
+      "variant": "Teste 01",
+      "variantId": "PLHPRD1I3XK",
+      "quantity": 1,
+      "unitPrice": "1.90"
+    }
+  ],
+  "ip": "168.227.33.139",
+  "externalRef": null
+}

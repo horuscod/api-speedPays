@@ -1,0 +1,42 @@
+{
+  "id": "ORGYXYR8IWCO",
+  "status": "PENDING",
+  "value": 10,
+  "paymentMethod": "PIX",
+  "installments": null,
+  "subscription": null,
+  "customer": {
+    "id": "CT3GZPPTLHTNVY",
+    "name": "Nome do novo usuário completo",
+    "email": "otavio@gmail.com",
+    "cellphone": "(16)99750-5927",
+    "document": "47305189855"
+  },
+  "shipping": {
+    "address": {
+      "cep": null,
+      "city": null,
+      "state": null,
+      "street": null,
+      "neighborhood": null,
+      "number": null,
+      "complement": null
+    }
+  },
+  "pix": {
+    "payload": "00020101021226830014br.gov.bcb.pix2561api.pagseguro.com/pix/v2/1901413D-6D09-49CA-A04F-93A3B5509DC627600016BR.COM.PAGSEGURO01361901413D-6D09-49CA-A04F-93A3B5509DC6520473725303986540510.005802BR5922ABMEX PAGAMENTOS INTEL6009Sao Paulo62070503***63045057"
+  },
+  "items": [
+    {
+      "productId": "PRRQUKX5OEM",
+      "title": "Taxa de abertura",
+      "variant": "Padrão",
+      "variantId": "PLQ7ZUH0ABV",
+      "quantity": 1,
+      "unitPrice": "10.00"
+    }
+  ],
+  "ip": "168.227.33.139",
+  "externalRef": null,
+  "qrCodeUrl": "https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=00020101021226830014br.gov.bcb.pix2561api.pagseguro.com%2Fpix%2Fv2%2F1901413D-6D09-49CA-A04F-93A3B5509DC627600016BR.COM.PAGSEGURO01361901413D-6D09-49CA-A04F-93A3B5509DC6520473725303986540510.005802BR5922ABMEX%20PAGAMENTOS%20INTEL6009Sao%20Paulo62070503***63045057&format=svg"
+}

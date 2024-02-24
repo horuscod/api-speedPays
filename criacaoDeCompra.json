@@ -1,0 +1,20 @@
+{
+  "customer": {
+    "name": "otavio",
+    "email": "otavioprosperus@gmail.com",
+    "document": "47305189855",
+    "cellphone": "(16)99750-5927"
+  },
+  "value": 1,
+  "paymentMethod": "pix",
+  "items": [
+    {
+      "isDigital": true,
+      "title": "Produto teste Otavio",
+      "variant": "Teste 01",
+      "unitPrice": 1.9,
+      "quantity": 1
+    }
+  ],
+  "ip": "168.227.33.139"
+}
