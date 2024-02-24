@@ -142,7 +142,7 @@ const initSetupRuleArkama = async (req, res) => {
       name: name,
       tokenArkama: tokenArkama,
     });
-    await userRef.update({ UID: userRef.id });
+    await userRef.update({ uid: userRef.id });
 
     const ordensRef = await db.collection("ordens").add({});
     await ordensRef.update({ UID: ordensRef.id });
