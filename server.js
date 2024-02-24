@@ -9,7 +9,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
 app.use(cors());
 
-
+app.set('trust proxy', true);
 
 const allowedIps = ["123.45.67.89", "98.76.54.32"];
 
