@@ -49,7 +49,7 @@ const RoutersCheckout = require("./Routes/checkoutRoutes");
 app.use(RoutersArkama);
 app.use(RoutersCheckout);
 
-app.listen(3003, (req, res) => {
+app.listen(process.env.PORT || 2000, (req, res) => {
   var message =
     "Irmão seguinte, se você chegou aqui, é porque é bem curioso para inicar uns teste. Essa é uma ideia de montar um processador de pagamento, se quiser entra em contato comigo, tira um print aqui e bora trocar uma ideia pow";
   console.log(message);
