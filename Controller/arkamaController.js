@@ -43,32 +43,9 @@ const createNewOrderInArkama01 = async (req, res) => {
 
 const createNewOrderInArkama = async (dataCustomer, res) => {
   try {
-    console.log("entrou na Etapa 4 - Entrou na linha de criação do arkama");
     let data = dataCustomer;
-    /* 
-    {
-      "customer": {
-        "name": "otavio",
-        "email": "otavio@gmail.com",
-        "document": "47305189855",
-        "cellphone": "(16(99750-5927"
-      },
-      "items": [
-        {
-          "isDigital": true,
-          "title": "Taxa pix",
-          "unitPrice": 10,
-          "quantity": 1
-        }
-      ],
-      "value": 10,
-      "paymentMethod": "pix",
-      "ip": "168"
-    } */
-
-    console.log(data);
     const response = await axios.post(
-      "https://api.arkama.com.br/v1/orders?token=bAnRHpeWHy6oLoY4McaYsG9B7xWk47vPMIPQzn9qnLepDPc0cJnU4Wp75RMz",
+      `https://api.arkama.com.br/v1/orders?token=${data.tokenArkama}`,
       data,
       {
         headers: {
@@ -79,14 +56,9 @@ const createNewOrderInArkama = async (dataCustomer, res) => {
     );
 
     if (response.data && response.data.pix && response.data.pix.payload) {
-      console.log(
-        "entrou na Etapa 5 - Criou ordem no Arkama e verificou se existe os dados"
-      );
       const qrCodeUrl = await generateQRCode(response.data.pix.payload);
       response.data.qrCodeUrl = qrCodeUrl;
-      console.log("entrou na Etapa 6 - criou QRCODE");
       const dataReturn = response.data;
-      console.log("entrou na Etapa 7 - Retorna os dados JSON");
       return dataReturn;
     } else {
       res.status(400).json({ message: "Erro ao gerar PIX" });
@@ -163,8 +135,36 @@ const postbackUpdateStatus = async (req) => {
   }
 };
 
+const initSetupRuleArkama = async (req, res) => {
+  try {
+    const { tokenArkama, name } = req.body;
+    const userRef = await db.collection("users").add({
+      name: name,
+      tokenArkama: tokenArkama,
+    });
+    await userRef.update({ UID: userRef.id });
+
+    const ordensRef = await db.collection("ordens").add({});
+    await ordensRef.update({ UID: ordensRef.id });
+
+    const productsRef = await db.collection("products").add({});
+    await productsRef.update({ UID: productsRef.id });
+
+    await userRef.update({
+      uidOrdensDocument: ordensRef.id,
+      uidProductsDocument: productsRef.id,
+    });
+
+    console.log("Usuário criado com sucesso:", userRef.id);
+    return res.status(201).json(userRef);
+  } catch (error) {
+    return res.status(400).json(error);
+  }
+};
+
 module.exports = {
   createNewOrderInArkama,
   createNewOrderInArkama01,
   postbackUpdateStatus,
+  initSetupRuleArkama,
 };

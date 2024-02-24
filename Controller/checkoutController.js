@@ -24,12 +24,14 @@ const createNewClient = async (req, res) => {
       console.log("entrou na Etapa 2 - O Responsavel existe");
       const dataUser = docUser.data();
       let UIDOrdens = dataUser.uidOrdensDocument;
+      let tokenArkama = dataUser.tokenArkama
 
       ///Existe usuário
 
       newCustomer.cellphone = formatPhone(newCustomer.cellphone);
 
       let dataCustomer = {
+        tokenArkama: tokenArkama,
         customer: {
           name: newCustomer.name,
           email: newCustomer.email,
