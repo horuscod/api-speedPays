@@ -1,4 +1,6 @@
 const axios = require("axios");
+const admin = require("../firebaseConfig");
+const db = admin.firestore();
 
 const createNewOrderInArkama01 = async (req, res) => {
   try {
@@ -43,7 +45,7 @@ const createNewOrderInArkama = async (dataCustomer, res) => {
   try {
     console.log("entrou na Etapa 4 - Entrou na linha de criação do arkama");
     let data = dataCustomer;
-/* 
+    /* 
     {
       "customer": {
         "name": "otavio",
@@ -77,7 +79,9 @@ const createNewOrderInArkama = async (dataCustomer, res) => {
     );
 
     if (response.data && response.data.pix && response.data.pix.payload) {
-      console.log("entrou na Etapa 5 - Criou ordem no Arkama e verificou se existe os dados");
+      console.log(
+        "entrou na Etapa 5 - Criou ordem no Arkama e verificou se existe os dados"
+      );
       const qrCodeUrl = await generateQRCode(response.data.pix.payload);
       response.data.qrCodeUrl = qrCodeUrl;
       console.log("entrou na Etapa 6 - criou QRCODE");
@@ -111,7 +115,56 @@ const generateQRCode = async (payload) => {
   }
 };
 
+const postbackUpdateStatus = async (req) => {
+  try {
+    const { tokenID } = req.params;
+    const { event, data } = req.body;
+    if (tokenID != null) {
+      const docRef = db.collection("users").doc(tokenID);
+      const doc = await docRef.get();
+
+      if (doc.exists) {
+        if (event === "ORDER_STATUS_CHANGED") {
+          let documentUser = doc.data();
+          var uidOrdensDocument = documentUser.uidOrdensDocument;
+          let dataID = data.id;
+          let dataStatus = data.status;
+
+          const docRefOrdem = db.collection("ordens").doc(uidOrdensDocument);
+          const docOrdem = await docRefOrdem.get();
+
+          if (docOrdem.exists) {
+            const ordemData = docOrdem.data();
+            const customerIndex = ordemData.customer.findIndex(
+              (c) => c.customerUID === dataID
+            );
+
+            if (customerIndex !== -1) {
+              ordemData.customer[customerIndex].status = dataStatus;
+              const updateStatus = await docRefOrdem.update({
+                customer: ordemData.customer,
+              });
+              if (updateStatus) {
+                return true;
+              } else {
+                return false;
+              }
+            }
+          }
+        }
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  } catch (error) {
+    return false;
+  }
+};
+
 module.exports = {
   createNewOrderInArkama,
   createNewOrderInArkama01,
+  postbackUpdateStatus,
 };
