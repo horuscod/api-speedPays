@@ -17,14 +17,14 @@ function formatPhone(phone) {
 const createNewClient = async (req, res) => {
   try {
     console.log("entrou na Etapa 1 - Criar novo cliente");
-    const { hashUser, newCustomer, product } = req.body;
+    const { hashUser, newCustomer, product, valueOffer } = req.body;
     const docRef = db.collection("users").doc(hashUser);
     const docUser = await docRef.get();
     if (docUser.exists) {
       console.log("entrou na Etapa 2 - O Responsavel existe");
       const dataUser = docUser.data();
       let UIDOrdens = dataUser.uidOrdensDocument;
-      let tokenArkama = dataUser.tokenArkama
+      let tokenArkama = dataUser.tokenArkama;
 
       ///Existe usuário
 
@@ -38,12 +38,12 @@ const createNewClient = async (req, res) => {
           document: newCustomer.document,
           cellphone: newCustomer.cellphone,
         },
-        value: 10.0,
+        value: valueOffer || 10,
         paymentMethod: "pix",
         items: [
           {
             title: product.name || "Taxa de abertura",
-            unitPrice: product.value || 10.0,
+            unitPrice: product.unitPrice || 10.0,
             quantity: 1,
             isDigital: true,
           },
