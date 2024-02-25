@@ -2,7 +2,13 @@ const express = require("express");
 const router = express.Router();
 const checkoutController = require("../Controller/checkoutController");
 
-router.post("/checkout", checkoutController.createNewCheckout);
+const checkoutMiddleware = require("../Middleware/checkoutMiddleware");
+
+router.post(
+  "/checkout",
+  checkoutMiddleware.checkDomainMiddleware,
+  checkoutController.createNewCheckout
+);
 
 router.post("/createNewClient", checkoutController.createNewClient);
 
