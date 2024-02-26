@@ -153,4 +153,48 @@ const createNewCheckout = async (req, res) => {
   }
 };
 
-module.exports = { createNewCheckout, createNewClient };
+const checkConfirmOrdemPAID = async (req, res) => {
+  // pegar quem é quem.
+  const { hashUser, hashCustomer } = req.body;
+
+  if (hashUser != null && hashCustomer != null) {
+    const docRef = db.collection("users").doc(hashUser);
+    const docUser = await docRef.get();
+    if (docUser.exists) {
+      const dataUser = docUser.data();
+      let UIDOrdens = dataUser.uidOrdensDocument;
+      const documentOrdensRef = db.collection("ordens").doc(UIDOrdens);
+      const docOrdens = await documentOrdensRef.get();
+
+      if (docOrdens.exists) {
+        const dataOrdens = docOrdens.data();
+        const customer = dataOrdens.customer;
+        const targetCustomer = customer.find(
+          (c) => c.customerUID === hashCustomer
+        );
+
+        if (targetCustomer.status === "PAID") {
+          return res.status(200).json({
+            message: "Cliente realizou o pagamento com sucesso!",
+            status: "PAGO",
+          });
+        } else if (targetCustomer.status === "PENDING") {
+          return res.status(200).json({
+            message: "Cliente ainda não realizou o pagamento!",
+            status: "PENDENTE",
+          });
+        } else {
+          return res.status(404).json({ message: "Cliente não encontrado" });
+        }
+      } else {
+        return res.status(404).json({ message: "Ordem não encontrada!" });
+      }
+    } else {
+      return res.status(404).json({ message: "Usuário não encontrado!" });
+    }
+  } else {
+    return res.status(404).json("Não encontrado, IP gravado");
+  }
+};
+
+module.exports = { createNewCheckout, createNewClient, checkConfirmOrdemPAID };

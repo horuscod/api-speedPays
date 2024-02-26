@@ -24,7 +24,7 @@ const limiter = rateLimit({
   },
 });
 
-app.use(limiter);
+/* app.use(limiter);
 
 const fs = require("fs");
 const path = require("path");
@@ -41,7 +41,7 @@ const logIpMiddleware = (req, res, next) => {
 };
 
 // Use o middleware antes das rotas
-app.use(logIpMiddleware);
+app.use(logIpMiddleware); */
 
 app.get("/", (req, res) => {
   res.send("Olá, Hórus!");
