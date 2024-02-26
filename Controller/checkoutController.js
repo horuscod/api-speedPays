@@ -94,6 +94,8 @@ const createNewClient = async (req, res) => {
           console.error("Erro ao atualizar o documento:", error);
           res.status(500).json({ message: "Erro ao atualizar o documento" });
         }
+      }else{
+        return res.status(200).json({mensage: 'Ordem não encontrada'});
       }
     }else{
       return res.status(200).json({mensage: 'Erro em comum. Informe os dados correto'});
