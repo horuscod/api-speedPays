@@ -25,7 +25,26 @@ const getOneUserInFirebase = async (req, res) => {
     return res.status(200).json(error);
   }
 };
+
+const getAllCustomerByUserUID = async (req, res) => {
+  try {
+    const { uidOrdensDocument } = req.body;
+    const docRef = db.collection("ordens").doc(uidOrdensDocument);
+    const docOrdem = await docRef.get();
+    if (docOrdem.exists) {
+      const dataOrdem = docOrdem.data();
+      return res.status(200).json(dataOrdem);
+    } else {
+      return res
+        .status(200)
+        .json({ message: "Ainda esse usuário não registrou nenhum cliente" });
+    }
+  } catch (error) {
+    return res.status(200).json(error);
+  }
+};
 module.exports = {
   getAllUsersInFirebase,
   getOneUserInFirebase,
+  getAllCustomerByUserUID,
 };

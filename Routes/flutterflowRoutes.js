@@ -10,4 +10,10 @@ router.post(
   flutterFlowController.getOneUserInFirebase
 );
 
+router.post(
+  "/flutterflow/getAllCustomer",
+  checkoutMiddleware.checkKeyFlutterFlow,
+  flutterFlowController.getAllCustomerByUserUID
+);
+
 module.exports = router;
