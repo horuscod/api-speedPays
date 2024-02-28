@@ -9,7 +9,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
 app.use(cors());
 
-app.set('trust proxy', 1);
+app.set("trust proxy", 1);
 
 const allowedIps = ["123.45.67.89", "98.76.54.32"];
 
@@ -17,7 +17,7 @@ const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
   keyGenerator: (req, res) => {
-    return req.headers['x-real-ip'] || req.ip;
+    return req.headers["x-real-ip"] || req.ip;
   },
   skip: function (req, res) {
     return allowedIps.includes(req.ip);
@@ -49,8 +49,10 @@ app.get("/", (req, res) => {
 
 const RoutersArkama = require("./Routes/arkamaRoutes");
 const RoutersCheckout = require("./Routes/checkoutRoutes");
+const RoutersFlutterFloow = require("./Routes/flutterflowRoutes");
 app.use(RoutersArkama);
 app.use(RoutersCheckout);
+app.use(RoutersFlutterFloow);
 
 app.listen(process.env.PORT || 2000, (req, res) => {
   var message =

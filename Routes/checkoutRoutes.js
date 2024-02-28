@@ -14,4 +14,5 @@ router.post("/createNewClient", checkoutController.createNewClient);
 
 router.post("/checkpayment", checkoutController.checkConfirmOrdemPAID);
 
+
 module.exports = router;
