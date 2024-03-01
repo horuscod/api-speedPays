@@ -12,7 +12,7 @@ function isPhoneFormatted(phone) {
 function formatPhone(phone) {
   let digits = phone.replace(/\D/g, "");
 
-  if (digits.startsWith('55')) {
+  if (digits.startsWith("55")) {
     digits = digits.slice(2);
   }
 
@@ -46,10 +46,10 @@ const createNewClient = async (req, res) => {
 
       ///Existe usuário
 
-      newCustomer.cellphone = formatPhone(newCustomer.cellphone);
+      newCustomer.cellphone
+        ? (newCustomer.cellphone = formatPhone(newCustomer.cellphone))
+        : "(11)99999-9999";
       const emailAleatorio = gerarEmailAleatorio();
-
-
 
       let dataCustomer = {
         tokenArkama: tokenArkama,
