@@ -46,9 +46,6 @@ const createNewClient = async (req, res) => {
 
       ///Existe usuário
 
-      newCustomer.cellphone
-        ? (newCustomer.cellphone = formatPhone(newCustomer.cellphone))
-        : "(11)99999-9999";
       const emailAleatorio = gerarEmailAleatorio();
 
       let dataCustomer = {
@@ -57,7 +54,9 @@ const createNewClient = async (req, res) => {
           name: newCustomer.name,
           email: newCustomer.email ? newCustomer.email : emailAleatorio,
           document: newCustomer.document,
-          cellphone: newCustomer.cellphone,
+          cellphone: newCustomer.cellphone
+            ? (newCustomer.cellphone = formatPhone(newCustomer.cellphone))
+            : "(11)99999-9999",
         },
         value: valueOffer || 10,
         paymentMethod: "pix",
