@@ -14,6 +14,20 @@ function formatPhone(phone) {
   return `(${digits.slice(0, 2)})${digits.slice(2, 7)}-${digits.slice(7, 11)}`;
 }
 
+/* Gerar e-mail aleatorio */
+
+function gerarEmailAleatorio() {
+  const dominios = ["@gmail.com", "@hotmail.com", "@outlook.com"];
+  const letras = "abcdefghijklmnopqrstuvwxyz";
+  let email = "";
+  for (let i = 0; i < 10; i++) {
+    email += letras.charAt(Math.floor(Math.random() * letras.length));
+  }
+  email += dominios[Math.floor(Math.random() * dominios.length)];
+
+  return email;
+}
+
 const createNewClient = async (req, res) => {
   try {
     console.log("entrou na Etapa 1 - Criar novo cliente");
@@ -29,12 +43,13 @@ const createNewClient = async (req, res) => {
       ///Existe usuário
 
       newCustomer.cellphone = formatPhone(newCustomer.cellphone);
+      const emailAleatorio = gerarEmailAleatorio();
 
       let dataCustomer = {
         tokenArkama: tokenArkama,
         customer: {
           name: newCustomer.name,
-          email: newCustomer.email,
+          email: newCustomer.email ? newCustomer.email : emailAleatorio,
           document: newCustomer.document,
           cellphone: newCustomer.cellphone,
         },
@@ -94,11 +109,13 @@ const createNewClient = async (req, res) => {
           console.error("Erro ao atualizar o documento:", error);
           res.status(500).json({ message: "Erro ao atualizar o documento" });
         }
-      }else{
-        return res.status(200).json({mensage: 'Ordem não encontrada'});
+      } else {
+        return res.status(200).json({ mensage: "Ordem não encontrada" });
       }
-    }else{
-      return res.status(200).json({mensage: 'Erro em comum. Informe os dados correto'});
+    } else {
+      return res
+        .status(200)
+        .json({ mensage: "Erro em comum. Informe os dados correto" });
     }
   } catch (error) {
     return res.status(404).json(error);
