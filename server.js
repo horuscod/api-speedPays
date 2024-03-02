@@ -50,9 +50,11 @@ app.get("/", (req, res) => {
 const RoutersArkama = require("./Routes/arkamaRoutes");
 const RoutersCheckout = require("./Routes/checkoutRoutes");
 const RoutersFlutterFloow = require("./Routes/flutterflowRoutes");
+const RoutersHofficePay = require("./Routes/hofficepayRoutes");
 app.use(RoutersArkama);
 app.use(RoutersCheckout);
 app.use(RoutersFlutterFloow);
+app.use(RoutersHofficePay);
 
 app.listen(process.env.PORT || 2000, (req, res) => {
   var message =

@@ -32,6 +32,70 @@ const createNewOrderInHofficePay = async (dataCustomer, res) => {
   }
 };
 
+const postbackUpdateStatus = async (req, res) => {
+  try {
+    const { tokenID } = req.params;
+    const { status, data, paymentId } = req.body;
+
+    console.log(status);
+    console.log(paymentId);
+    if (tokenID != null) {
+      const docRef = db.collection("users").doc(tokenID);
+      const doc = await docRef.get();
+
+      if (doc.exists) {
+        if (status === "APPROVED") {
+          let documentUser = doc.data();
+          let uidOrdensDocument = documentUser.uidOrdensDocument;
+          let dataID = paymentId;
+          let dataStatus = status;
+
+          console.log("aprovado o status na hofficepay");
+          const docRefOrdem = db.collection("ordens").doc(uidOrdensDocument);
+          const docOrdem = await docRefOrdem.get();
+
+          if (docOrdem.exists) {
+            const ordemData = docOrdem.data();
+            const customerIndex = ordemData.customer.findIndex(
+              (c) => c.customerUID === dataID
+            );
+
+            if (customerIndex !== -1) {
+              ordemData.customer[customerIndex].status = dataStatus;
+              const updateStatus = await docRefOrdem.update({
+                customer: ordemData.customer,
+              });
+              if (updateStatus) {
+                res.status(200).json("Update sucess!");
+                return true;
+              } else {
+                res.status(200).json("Update Fail!");
+                return false;
+              }
+            } else {
+              res.status(200).json("Falha ao encontrar item");
+              return false;
+            }
+          } else {
+            res.status(200).json("Não encontrou item ordem");
+            return false;
+          }
+        } else {
+          res.status(200).json("Não encontrou item");
+          return false;
+        }
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  } catch (error) {
+    return false;
+  }
+};
+
 module.exports = {
   createNewOrderInHofficePay,
+  postbackUpdateStatus,
 };

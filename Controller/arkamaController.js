@@ -56,8 +56,7 @@ const createNewOrderInArkama = async (dataCustomer, res) => {
       }
     );
 
-
-    console.log(response)
+    console.log(response);
 
     if (response.data && response.data.pix && response.data.pix.payload) {
       const qrCodeUrl = await generateQRCode(response.data.pix.payload);
@@ -93,19 +92,25 @@ const generateQRCode = async (payload) => {
 
 const postbackUpdateStatus = async (req) => {
   try {
+    console.log('entrou webhook')
     const { tokenID } = req.params;
-    const { event, data } = req.body;
+    const { status, data, paymentId } = req.body;
+
+    console.log(status);
+    console.log(paymentId);
+
     if (tokenID != null) {
       const docRef = db.collection("users").doc(tokenID);
       const doc = await docRef.get();
 
       if (doc.exists) {
-        if (event === "ORDER_STATUS_CHANGED") {
+        if (status === "APPROVED") {
           let documentUser = doc.data();
-          var uidOrdensDocument = documentUser.uidOrdensDocument;
-          let dataID = data.id;
-          let dataStatus = data.status;
+          let uidOrdensDocument = documentUser.uidOrdensDocument;
+          let dataID = paymentId;
+          let dataStatus = status;
 
+          console.log("aprovado o status na hofficepay");
           const docRefOrdem = db.collection("ordens").doc(uidOrdensDocument);
           const docOrdem = await docRefOrdem.get();
 
