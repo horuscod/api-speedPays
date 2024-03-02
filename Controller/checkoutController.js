@@ -312,7 +312,7 @@ const checkConfirmOrdemPAID = async (req, res) => {
           (c) => c.customerUID === hashCustomer
         );
 
-        if (targetCustomer.status === "PAID") {
+        if (targetCustomer.status === "PAID" || targetCustomer.status === "APPROVED") {
           return res.status(200).json({
             message: "Cliente realizou o pagamento com sucesso!",
             status: "PAGO",
