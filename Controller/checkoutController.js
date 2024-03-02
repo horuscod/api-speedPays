@@ -1,6 +1,7 @@
 const admin = require("../firebaseConfig");
 const db = admin.firestore();
 const ArkamaController = require("./arkamaController");
+const HofficePayController = require("./hofficepayController");
 
 /* Functions Formats data */
 
@@ -34,89 +35,201 @@ function gerarEmailAleatorio() {
 
 const createNewClient = async (req, res) => {
   try {
-    console.log("entrou na Etapa 1 - Criar novo cliente");
-    const { hashUser, newCustomer, product, valueOffer } = req.body;
+    const {
+      hashUser,
+      newCustomer,
+      product,
+      valueOffer,
+      typeBank,
+      tracking,
+      utmsData,
+    } = req.body;
     const docRef = db.collection("users").doc(hashUser);
     const docUser = await docRef.get();
+
+    console.log("entrou dentro do new cliente");
+    /* 
+    typeBank: é o tipo de banco. Atualiza essa anotação, estou trabalhando com o ARKAMA, HOFFICEPAY 
+    typeBank:[{
+      name: 'arkama', 
+      active: true
+    }, 
+    {
+      name: 'hofficepay', 
+      active: true
+    }]
+    */
+
     if (docUser.exists) {
-      console.log("entrou na Etapa 2 - O Responsavel existe");
       const dataUser = docUser.data();
-      let UIDOrdens = dataUser.uidOrdensDocument;
+      const UIDOrdens = dataUser.uidOrdensDocument;
+      let typeBankData = dataUser.typeBankData;
+      let activeBank = typeBankData.find((bank) => bank.active);
+
       let tokenArkama = dataUser.tokenArkama;
+      if (
+        typeBank == "arkama" &&
+        typeBankData.name === "arkama" &&
+        typeBankData.active
+      ) {
+        let dataCustomer = {
+          tokenArkama: tokenArkama,
+          customer: {
+            name: newCustomer.name,
+            email: newCustomer.email ? newCustomer.email : emailAleatorio,
+            document: newCustomer.document,
+            cellphone: newCustomer.cellphone
+              ? (newCustomer.cellphone = formatPhone(newCustomer.cellphone))
+              : "(11)99999-9999",
+          },
+          value: valueOffer || 10,
+          paymentMethod: "pix",
+          items: [
+            {
+              title: product.name || "Taxa de abertura",
+              unitPrice: product.unitPrice || 10.0,
+              quantity: 1,
+              isDigital: true,
+            },
+          ],
+          ip: newCustomer.ip,
+        };
+
+        const CreateOrdemArkama = await ArkamaController.createNewOrderInArkama(
+          dataCustomer
+        );
+
+        if (CreateOrdemArkama) {
+          console.log("entrou na Etapa 8 - Criou no arkama e agora é update");
+          let customerSpeedPays = {
+            customerUID: CreateOrdemArkama.id,
+            arkamaDataID: CreateOrdemArkama.id,
+            name: CreateOrdemArkama.customer.name,
+            email: CreateOrdemArkama.customer.email,
+            cellphone: CreateOrdemArkama.customer.cellphone,
+            document: CreateOrdemArkama.customer.document,
+            ip: CreateOrdemArkama.ip,
+            payloadPix: CreateOrdemArkama.pix.payload,
+            URLPixQrCode: CreateOrdemArkama.qrCodeUrl,
+            status: CreateOrdemArkama.status,
+          };
+
+          const documentRef = db.collection("ordens").doc(UIDOrdens);
+
+          try {
+            await documentRef.update({
+              customer: admin.firestore.FieldValue.arrayUnion({
+                ...customerSpeedPays,
+              }),
+            });
+
+            let dataResponse = {
+              usID: dataUser.uid,
+              pdID: dataUser.uidProductsDocument,
+              hhID: dataUser.uidOrdensDocument,
+              crID: CreateOrdemArkama.id,
+            };
+            return res.status(200).json({
+              message:
+                "Checkout Criado com sucesso, use esses dados para criar seu checkout",
+              dataResponse,
+            });
+          } catch (error) {
+            console.error("Erro ao atualizar o documento:", error);
+            res.status(500).json({ message: "Erro ao atualizar o documento" });
+          }
+        } else {
+          return res.status(200).json({ mensage: "Ordem não encontrada" });
+        }
+      } else if (
+        activeBank &&
+        typeBank == activeBank.name &&
+        typeBank == "hofficepay"
+      ) {
+        /* filtro de tipo de banco adicionar na variavel e passa o token */
+        const emailUser = newCustomer.email
+          ? newCustomer.email
+          : "email@gmail.com";
+        const cellphoneUser = newCustomer.cellphone
+          ? newCustomer.cellphone
+          : "5511999999999";
+
+        let dataCustomer = {
+          name: newCustomer.name,
+          email: emailUser,
+          cpf: newCustomer.cpf,
+          phone: cellphoneUser,
+          offerId: product.offerId,
+          utmQuery: tracking.utms,
+        };
+
+        const responseHofficePay =
+          await HofficePayController.createNewOrderInHofficePay(dataCustomer);
+
+        if (responseHofficePay && Object.keys(responseHofficePay).length > 0) {
+          //PIX foi gerado com sucesso no adquirente. Vamos levar para o front-end aqui
+
+          const customerSpeedPays = {
+            customerUID: responseHofficePay.paymentId,
+            hashOrdem: responseHofficePay.paymentId,
+            name: newCustomer.name,
+            email: emailUser,
+            cellphone: cellphoneUser,
+            document: newCustomer.cpf,
+            ip: newCustomer.ip ? newCustomer.ip : "Não pegou IP",
+            payloadPix: responseHofficePay.pixCode,
+            URLPixQrCode: responseHofficePay.pixQRCODE,
+            status: "PENDING",
+            utms: utmsData
+              ? {
+                  utm_id: utmsData.utm_id ? utmsData.utm_id : "",
+                  utm_source: utmsData.utm_source ? utmsData.utm_source : "",
+                  utm_medium: utmsData.utm_medium ? utmsData.utm_medium : "",
+                  utm_campaign: utmsData.utm_campaign
+                    ? utmsData.utm_campaign
+                    : "",
+                  utm_term: utmsData.utm_term ? utmsData.utm_term : "",
+                  utm_content: utmsData.utm_content ? utmsData.utm_content : "",
+                }
+              : {},
+          };
+          const documentRef = db.collection("ordens").doc(UIDOrdens);
+
+          try {
+            await documentRef.update({
+              customer: admin.firestore.FieldValue.arrayUnion({
+                ...customerSpeedPays,
+              }),
+            });
+
+            ///esse PD tenho que ajustar
+            let dataResponse = {
+              usID: dataUser.uid,
+              pdID: dataUser.uidProductsDocument,
+              hhID: dataUser.uidOrdensDocument,
+              crID: responseHofficePay.paymentId,
+            };
+            return res.status(200).json({
+              message:
+                "Checkout Criado com sucesso, use esses dados para criar seu checkout",
+              dataResponse,
+            });
+          } catch (error) {
+            console.error("Erro ao atualizar o documento:", error);
+            return res
+              .status(500)
+              .json({ message: "Erro ao atualizar o documento" });
+          }
+        } else {
+          return res.status(200).json({ mensage: "Ordem não encontrada" });
+        }
+      } else {
+        return res.status(200).json({ mensage: "Deu algum erro por aqui" });
+      }
 
       ///Existe usuário
 
       const emailAleatorio = gerarEmailAleatorio();
-
-      let dataCustomer = {
-        tokenArkama: tokenArkama,
-        customer: {
-          name: newCustomer.name,
-          email: newCustomer.email ? newCustomer.email : emailAleatorio,
-          document: newCustomer.document,
-          cellphone: newCustomer.cellphone
-            ? (newCustomer.cellphone = formatPhone(newCustomer.cellphone))
-            : "(11)99999-9999",
-        },
-        value: valueOffer || 10,
-        paymentMethod: "pix",
-        items: [
-          {
-            title: product.name || "Taxa de abertura",
-            unitPrice: product.unitPrice || 10.0,
-            quantity: 1,
-            isDigital: true,
-          },
-        ],
-        ip: newCustomer.ip,
-      };
-
-      const CreateOrdemArkama = await ArkamaController.createNewOrderInArkama(
-        dataCustomer
-      );
-
-      if (CreateOrdemArkama) {
-        console.log("entrou na Etapa 8 - Criou no arkama e agora é update");
-        let customerSpeedPays = {
-          customerUID: CreateOrdemArkama.id,
-          arkamaDataID: CreateOrdemArkama.id,
-          name: CreateOrdemArkama.customer.name,
-          email: CreateOrdemArkama.customer.email,
-          cellphone: CreateOrdemArkama.customer.cellphone,
-          document: CreateOrdemArkama.customer.document,
-          ip: CreateOrdemArkama.ip,
-          payloadPix: CreateOrdemArkama.pix.payload,
-          URLPixQrCode: CreateOrdemArkama.qrCodeUrl,
-          status: CreateOrdemArkama.status,
-        };
-
-        const documentRef = db.collection("ordens").doc(UIDOrdens);
-
-        try {
-          await documentRef.update({
-            customer: admin.firestore.FieldValue.arrayUnion({
-              ...customerSpeedPays,
-            }),
-          });
-
-          let dataResponse = {
-            usID: dataUser.uid,
-            pdID: dataUser.uidProductsDocument,
-            hhID: dataUser.uidOrdensDocument,
-            crID: CreateOrdemArkama.id,
-          };
-          return res.status(200).json({
-            message:
-              "Checkout Criado com sucesso, use esses dados para criar seu checkout",
-            dataResponse,
-          });
-        } catch (error) {
-          console.error("Erro ao atualizar o documento:", error);
-          res.status(500).json({ message: "Erro ao atualizar o documento" });
-        }
-      } else {
-        return res.status(200).json({ mensage: "Ordem não encontrada" });
-      }
     } else {
       return res
         .status(200)

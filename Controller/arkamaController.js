@@ -44,6 +44,7 @@ const createNewOrderInArkama01 = async (req, res) => {
 const createNewOrderInArkama = async (dataCustomer, res) => {
   try {
     let data = dataCustomer;
+
     const response = await axios.post(
       `https://api.arkama.com.br/v1/orders?token=${data.tokenArkama}`,
       data,
@@ -54,6 +55,9 @@ const createNewOrderInArkama = async (dataCustomer, res) => {
         },
       }
     );
+
+
+    console.log(response)
 
     if (response.data && response.data.pix && response.data.pix.payload) {
       const qrCodeUrl = await generateQRCode(response.data.pix.payload);
