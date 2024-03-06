@@ -147,6 +147,8 @@ const createNewClient = async (req, res) => {
         typeBank == "hofficepay"
       ) {
         /* filtro de tipo de banco adicionar na variavel e passa o token */
+
+        console.log('entrou na criação da hoffipay')
         const emailUser = newCustomer.email
           ? newCustomer.email
           : "email@gmail.com";
@@ -171,9 +173,8 @@ const createNewClient = async (req, res) => {
           //PIX foi gerado com sucesso no adquirente. Vamos levar para o front-end aqui
 
           /* Gerar ultimo nome */
-          const partes = newCustomer.name.split(" ");
-          const lastName = partes.slice(1).join(" ");
-
+        
+          console.log('entrou para criar usuario no bda')
           const customerSpeedPays = {
             customerUID: responseHofficePay.paymentId,
             hashOrdem: responseHofficePay.paymentId,
@@ -181,7 +182,7 @@ const createNewClient = async (req, res) => {
             document: newCustomer.cpf,
             email: emailUser,
             cellphone: cellphoneUser,
-            lastName: lastName,
+            lastName: "",
             gener: newCustomer.gener ? newCustomer.gener : "",
             dateBorn: newCustomer.gener ? newCustomer.gener : "",
             cep: newCustomer.cep ? newCustomer.cep : "",
