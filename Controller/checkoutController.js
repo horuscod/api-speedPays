@@ -2,6 +2,7 @@ const admin = require("../firebaseConfig");
 const db = admin.firestore();
 const ArkamaController = require("./arkamaController");
 const HofficePayController = require("./hofficepayController");
+const EventsFacebookController = require("./eventsFacebookController");
 
 /* Functions Formats data */
 
@@ -47,7 +48,6 @@ const createNewClient = async (req, res) => {
     const docRef = db.collection("users").doc(hashUser);
     const docUser = await docRef.get();
 
-    console.log("entrou dentro do new cliente");
     /* 
     typeBank: é o tipo de banco. Atualiza essa anotação, estou trabalhando com o ARKAMA, HOFFICEPAY 
     typeBank:[{
@@ -161,6 +161,7 @@ const createNewClient = async (req, res) => {
           phone: cellphoneUser,
           offerId: product.offerId,
           utmQuery: tracking.utms,
+          utmsData: utmsData.length > 0 ? utmsData : null,
         };
 
         const responseHofficePay =
@@ -301,6 +302,7 @@ const checkConfirmOrdemPAID = async (req, res) => {
     const docUser = await docRef.get();
     if (docUser.exists) {
       const dataUser = docUser.data();
+     
       let UIDOrdens = dataUser.uidOrdensDocument;
       const documentOrdensRef = db.collection("ordens").doc(UIDOrdens);
       const docOrdens = await documentOrdensRef.get();
@@ -312,7 +314,11 @@ const checkConfirmOrdemPAID = async (req, res) => {
           (c) => c.customerUID === hashCustomer
         );
 
-        if (targetCustomer.status === "PAID" || targetCustomer.status === "APPROVED") {
+        if (
+          targetCustomer.status === "PAID" ||
+          targetCustomer.status === "APPROVED"
+        ) {
+          
           return res.status(200).json({
             message: "Cliente realizou o pagamento com sucesso!",
             status: "PAGO",

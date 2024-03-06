@@ -2,6 +2,8 @@ const axios = require("axios");
 const admin = require("../firebaseConfig");
 const db = admin.firestore();
 
+const EventsFacebookController = require("./eventsFacebookController");
+
 const createNewOrderInHofficePay = async (dataCustomer, res) => {
   try {
     let data = dataCustomer;
@@ -47,6 +49,7 @@ const postbackUpdateStatus = async (req, res) => {
         if (status === "APPROVED") {
           let documentUser = doc.data();
           let uidOrdensDocument = documentUser.uidOrdensDocument;
+          const dataFacebookTracking = documentUser.dataFacebookTracking;
           let dataID = paymentId;
           let dataStatus = status;
 
@@ -66,6 +69,27 @@ const postbackUpdateStatus = async (req, res) => {
                 customer: ordemData.customer,
               });
               if (updateStatus) {
+
+                console.log(ordemData.customer[customerIndex].name)
+                const dataEventPurchaseAction = {
+                  valueProduct: 10.0,
+                  customer: {
+                    name: ordemData.customer[customerIndex].name,
+                    email: ordemData.customer[customerIndex].email,
+                    cellphone: ordemData.customer[customerIndex].cellphone,
+                  },
+                  facebookTracking: dataFacebookTracking,
+                };
+
+                try {
+                  await EventsFacebookController.sendFacebookPurchaseEvent(
+                    dataEventPurchaseAction
+                  );
+                  console.log("Evento de compra enviado com sucesso!");
+                } catch (error) {
+                  console.error("Erro ao enviar evento de compra:", error);
+                }
+
                 res.status(200).json("Update sucess!");
                 return true;
               } else {
