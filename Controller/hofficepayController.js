@@ -66,8 +66,8 @@ const postbackUpdateStatus = async (req, res) => {
               if (updateStatus) {
                 console.log(ordemData.customer[customerIndex].name);
 
-                const dataUTMFbc = ordemData.customer[customerIndex].fbc || "";
-                const dataUTMFbp = ordemData.customer[customerIndex].fbp || "";
+                const dataUTMFbc = ordemData.customer[customerIndex].utms.fbc || "";
+                const dataUTMFbp = ordemData.customer[customerIndex].utms.fbp || "";
                 const dataUTMClientIp =
                   ordemData.customer[customerIndex].client_ip_address || "";
 

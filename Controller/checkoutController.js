@@ -170,19 +170,34 @@ const createNewClient = async (req, res) => {
         if (responseHofficePay && Object.keys(responseHofficePay).length > 0) {
           //PIX foi gerado com sucesso no adquirente. Vamos levar para o front-end aqui
 
+          /* Gerar ultimo nome */
+          const partes = newCustomer.name.split(" ");
+          const lastName = partes.slice(1).join(" ");
+
           const customerSpeedPays = {
             customerUID: responseHofficePay.paymentId,
             hashOrdem: responseHofficePay.paymentId,
             name: newCustomer.name,
+            document: newCustomer.cpf,
             email: emailUser,
             cellphone: cellphoneUser,
-            document: newCustomer.cpf,
-            ip: newCustomer.ip ? newCustomer.ip : "Não pegou IP",
+            lastName: lastName,
+            gener: newCustomer.gener ? newCustomer.gener : "",
+            dateBorn: newCustomer.gener ? newCustomer.gener : "",
+            cep: newCustomer.cep ? newCustomer.cep : "",
+            stateOfCity: newCustomer.stateOfCity ? newCustomer.stateOfCity : "",
+            city: newCustomer.city ? newCustomer.city : "",
+            productValue: product.productValue ? product.productValue : 0.0,
+            client_ip_address: newCustomer.client_ip_address
+              ? newCustomer.client_ip_address
+              : "",
             payloadPix: responseHofficePay.pixCode,
             URLPixQrCode: responseHofficePay.pixQRCODE,
             status: "PENDING",
             utms: utmsData
               ? {
+                  fbc: utmsData.fbc ? utmsData.fbc : "",
+                  fbp: utmsData.fbp ? utmsData.fbp : "",
                   utm_id: utmsData.utm_id ? utmsData.utm_id : "",
                   utm_source: utmsData.utm_source ? utmsData.utm_source : "",
                   utm_medium: utmsData.utm_medium ? utmsData.utm_medium : "",
@@ -302,7 +317,7 @@ const checkConfirmOrdemPAID = async (req, res) => {
     const docUser = await docRef.get();
     if (docUser.exists) {
       const dataUser = docUser.data();
-     
+
       let UIDOrdens = dataUser.uidOrdensDocument;
       const documentOrdensRef = db.collection("ordens").doc(UIDOrdens);
       const docOrdens = await documentOrdensRef.get();
@@ -318,7 +333,6 @@ const checkConfirmOrdemPAID = async (req, res) => {
           targetCustomer.status === "PAID" ||
           targetCustomer.status === "APPROVED"
         ) {
-          
           return res.status(200).json({
             message: "Cliente realizou o pagamento com sucesso!",
             status: "PAGO",
