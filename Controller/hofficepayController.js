@@ -34,6 +34,7 @@ const createNewOrderInHofficePay = async (dataCustomer, res) => {
   }
 };
 
+/* Ativa já o evento de COMPRA REALIZADA. Quando o status é atualizado */
 const postbackUpdateStatus = async (req, res) => {
   try {
     const { tokenID } = req.params;

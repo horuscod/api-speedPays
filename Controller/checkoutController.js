@@ -258,6 +258,8 @@ const createNewClient = async (req, res) => {
   }
 };
 
+
+/* Ativa já o evento de iniciação de checkout. Quando o checkout é criado */
 const createNewCheckout = async (req, res) => {
   try {
     const { hashUser, hashProduct, hashOrdem, customerUID } = req.body || "";
