@@ -6,7 +6,7 @@ const checkoutMiddleware = require("../Middleware/checkoutMiddleware");
 
 router.post(
   "/checkout",
-  checkoutMiddleware.checkDomainMiddleware,
+
   checkoutController.createNewCheckout
 );
 

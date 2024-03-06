@@ -63,6 +63,7 @@ const createNewClient = async (req, res) => {
     if (docUser.exists) {
       const dataUser = docUser.data();
       const UIDOrdens = dataUser.uidOrdensDocument;
+
       let typeBankData = dataUser.typeBankData;
       let activeBank = typeBankData.find((bank) => bank.active);
 
@@ -267,6 +268,7 @@ const createNewCheckout = async (req, res) => {
       dataUser = doc.data();
       var uidOrdensDocument = dataUser.uidOrdensDocument;
       var uidProductsDocument = dataUser.uidProductsDocument;
+      const dataFacebookTracking = dataUser.dataFacebookTracking;
       if (
         hashProduct === uidProductsDocument &&
         hashOrdem === uidOrdensDocument
@@ -281,6 +283,40 @@ const createNewCheckout = async (req, res) => {
           );
 
           if (customerData) {
+            console.log(customerData);
+
+            /* Acionar o PIXEL de iniciar checkout */
+
+            const dataEventAction = {
+              dataPixesFacebook: dataFacebookTracking,
+              dataCustomer: {
+                name: customerData.name,
+                email: customerData.email,
+                cellphone: `+${customerData.cellphone}`,
+                lastName: customerData.lastName,
+                gener: customerData.gener,
+                dateBorn: customerData.dateBorn,
+                cep: customerData.cep,
+                stateOfCity: customerData.stateOfCity,
+                city: customerData.city,
+              },
+
+              dataUTM: {
+                fbc: customerData.utms.fbc ? customerData.utms.fbc : null,
+                fbp: customerData.utms.fbp ? customerData.utms.fbp : null,
+                client_ip_address: customerData.client_ip_address,
+              },
+              productValue: customerData.productValue,
+            };
+
+            try {
+              await EventsFacebookController.eventInitiateCheckout(
+                dataEventAction
+              );
+              console.log("Evento de iniciação de Compra Okay");
+            } catch (error) {
+              console.error("Erro ao enviar evento de compra:", error);
+            }
             // O customerUID corresponde, faça o que for necessário com os dados
             return res.status(200).json(customerData);
           } else {
@@ -320,6 +356,7 @@ const checkConfirmOrdemPAID = async (req, res) => {
       const dataUser = docUser.data();
 
       let UIDOrdens = dataUser.uidOrdensDocument;
+
       const documentOrdensRef = db.collection("ordens").doc(UIDOrdens);
       const docOrdens = await documentOrdensRef.get();
 

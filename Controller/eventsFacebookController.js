@@ -134,7 +134,7 @@ const eventPurchase = async (data) => {
           data: [
             {
               event_name: "Purchase",
-              event_time: 1709699746,
+              event_time: Math.floor(Date.now() / 1000),
               action_source: "website",
               content_type: "product",
               user_data: {
@@ -187,49 +187,26 @@ const eventPurchase = async (data) => {
   }
 };
 
-const eventInitiateCheckout = async (data) => {
+const eventInitiateCheckout = async (dataCollection) => {
   try {
-    const { dataPixesFacebook, dataCustomer, dataUTM, productValue } = data;
+    console.log('Entrou na iniciação do evento');
+
+    const { dataPixesFacebook, dataCustomer, dataUTM, productValue } = dataCollection;
+    const results = [];
+
     for (const pixel of dataPixesFacebook) {
       const shouldSendEvent = pixel.status === "active";
+      
       if (shouldSendEvent) {
-        /* Convert datas in HASH-256 */
-        const hashName = crypto
-          .createHash("sha256")
-          .update(dataCustomer.name)
-          .digest("hex");
-        const hasEmail = crypto
-          .createHash("sha256")
-          .update(dataCustomer.email)
-          .digest("hex");
-        const hashPhone = crypto
-          .createHash("sha256")
-          .update(dataCustomer.callphone)
-          .digest("hex");
-        const hashLastName = crypto
-          .createHash("sha256")
-          .update(dataCustomer.lastName)
-          .digest("hex");
-        const hashGener = crypto
-          .createHash("sha256")
-          .update(dataCustomer.dataGener)
-          .digest("hex");
-        const hashDateBorn = crypto
-          .createHash("sha256")
-          .update(dataCustomer.dateBorn)
-          .digest("hex");
-        const hashCodCEP = crypto
-          .createHash("sha256")
-          .update(dataCustomer.cep)
-          .digest("hex");
-        const hashStateOfCity = crypto
-          .createHash("sha256")
-          .update(dataCustomer.stateOfCity)
-          .digest("hex");
-        const hashCity = crypto
-          .createHash("sha256")
-          .update(dataCustomer.city)
-          .digest("hex");
+        const hashName = crypto.createHash("sha256").update(dataCustomer.name).digest("hex");
+        const hasEmail = crypto.createHash("sha256").update(dataCustomer.email).digest("hex");
+        const hashPhone = crypto.createHash("sha256").update(dataCustomer.cellphone).digest("hex");
+        const hashLastName = crypto.createHash("sha256").update(dataCustomer.lastName).digest("hex");
+        const hashGener = crypto.createHash("sha256").update(dataCustomer.gener).digest("hex");
+        const hashDateBorn = crypto.createHash("sha256").update(dataCustomer.dateBorn).digest("hex");
+        const hashCodCEP = crypto.createHash("sha256").update(dataCustomer.cep).digest("hex");
+        const hashStateOfCity = crypto.createHash("sha256").update(dataCustomer.stateOfCity).digest("hex");
+        const hashCity = crypto.createHash("sha256").update(dataCustomer.city).digest("hex");
 
         const url = `https://graph.facebook.com/v16.0/${pixel.pixelID}/events?access_token=${pixel.tokenPixelID}`;
 
@@ -237,7 +214,7 @@ const eventInitiateCheckout = async (data) => {
           data: [
             {
               event_name: "InitiateCheckout",
-              event_time: 1709699746,
+              event_time: Math.floor(Date.now() / 1000),
               action_source: "website",
               content_type: "product",
               user_data: {
@@ -275,20 +252,21 @@ const eventInitiateCheckout = async (data) => {
         try {
           const response = await axios.post(url, dataEvent, config);
           console.log("Resposta da requisição:", response.data);
-          return response.data;
+          results.push(response.data);
         } catch (error) {
           console.error("Erro na requisição:", error.response.data);
-          throw error;
+          results.push({ error: error.response.data });
         }
-      } else {
-        return false;
       }
     }
+
+    return results;
   } catch (error) {
-    let messageError = `Opss error ${error}`;
-    return messageError;
+    console.error(`Opss error ${error}`);
+    throw error;
   }
 };
+
 
 const aa = async (pixelId, accessToken, eventData) => {
   const url = `https://graph.facebook.com/v15.0/${pixelId}/events`;
