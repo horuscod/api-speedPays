@@ -59,7 +59,7 @@ const sendFacebookPurchaseEvent = async (dataUser) => {
                 fbp: "fb.1.1708049982830.567216466",
               },
               currency: "BRL",
-             
+
               value: 10.0,
 
               custom_data: {
@@ -84,6 +84,109 @@ const sendFacebookPurchaseEvent = async (dataUser) => {
   }
 };
 
+const eventPurchase = async (data) => {
+  try {
+    const { dataPixesFacebook, dataCustomer, dataUTM, productValue } = data;
+    for (const pixel of dataPixesFacebook) {
+      const shouldSendEvent = pixel.status === "active";
+      if (shouldSendEvent) {
+        /* Convert datas in HASH-256 */
+        const hashName = crypto
+          .createHash("sha256")
+          .update(dataCustomer.name)
+          .digest("hex");
+        const hasEmail = crypto
+          .createHash("sha256")
+          .update(dataCustomer.email)
+          .digest("hex");
+        const hashPhone = crypto
+          .createHash("sha256")
+          .update(dataCustomer.callphone)
+          .digest("hex");
+        const hashLastName = crypto
+          .createHash("sha256")
+          .update(dataCustomer.lastName)
+          .digest("hex");
+        const hashGener = crypto
+          .createHash("sha256")
+          .update(dataCustomer.dataGener)
+          .digest("hex");
+        const hashDateBorn = crypto
+          .createHash("sha256")
+          .update(dataCustomer.dateBorn)
+          .digest("hex");
+        const hashCodCEP = crypto
+          .createHash("sha256")
+          .update(dataCustomer.cep)
+          .digest("hex");
+        const hashStateOfCity = crypto
+          .createHash("sha256")
+          .update(dataCustomer.stateOfCity)
+          .digest("hex");
+        const hashCity = crypto
+          .createHash("sha256")
+          .update(dataCustomer.city)
+          .digest("hex");
+
+        const url = `https://graph.facebook.com/v16.0/${pixel.pixelID}/events?access_token=${pixel.tokenPixelID}`;
+
+        const dataEvent = {
+          data: [
+            {
+              event_name: "Purchase",
+              event_time: 1709699746,
+              action_source: "website",
+              content_type: "product",
+              user_data: {
+                em: [hasEmail],
+                ph: [hashPhone],
+                fn: [hashName],
+                ge: [hashGener],
+                ln: [hashLastName],
+                db: [hashDateBorn],
+                zp: [hashCodCEP],
+                st: [hashStateOfCity],
+                ct: [hashCity],
+                fbc: dataUTM.fbc,
+                fbp: dataUTM.fbp,
+                client_ip_address: dataUTM.client_ip_address,
+              },
+              custom_data: {
+                currency: "BRL",
+                value: productValue,
+                client_ip_address: dataUTM.client_ip_address,
+                fbc: dataUTM.fbc,
+                fbp: dataUTM.fbp,
+                city: dataCustomer.city,
+              },
+            },
+          ],
+        };
+
+        const config = {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        };
+
+        try {
+          const response = await axios.post(url, dataEvent, config);
+          console.log("Resposta da requisição:", response.data);
+          return response.data;
+        } catch (error) {
+          console.error("Erro na requisição:", error.response.data);
+          throw error;
+        }
+      } else {
+        return false;
+      }
+    }
+  } catch (error) {
+    let messageError = `Opss error ${error}`;
+    return messageError;
+  }
+};
+
 const aa = async (pixelId, accessToken, eventData) => {
   const url = `https://graph.facebook.com/v15.0/${pixelId}/events`;
   const data = {
@@ -102,4 +205,4 @@ const aa = async (pixelId, accessToken, eventData) => {
   }
 };
 
-module.exports = { sendFacebookPurchaseEvent };
+module.exports = { sendFacebookPurchaseEvent, eventPurchase };

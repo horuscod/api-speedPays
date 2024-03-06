@@ -38,9 +38,6 @@ const postbackUpdateStatus = async (req, res) => {
   try {
     const { tokenID } = req.params;
     const { status, data, paymentId } = req.body;
-
-    console.log(status);
-    console.log(paymentId);
     if (tokenID != null) {
       const docRef = db.collection("users").doc(tokenID);
       const doc = await docRef.get();
@@ -52,8 +49,6 @@ const postbackUpdateStatus = async (req, res) => {
           const dataFacebookTracking = documentUser.dataFacebookTracking;
           let dataID = paymentId;
           let dataStatus = status;
-
-          console.log("aprovado o status na hofficepay");
           const docRefOrdem = db.collection("ordens").doc(uidOrdensDocument);
           const docOrdem = await docRefOrdem.get();
 
@@ -69,20 +64,61 @@ const postbackUpdateStatus = async (req, res) => {
                 customer: ordemData.customer,
               });
               if (updateStatus) {
+                console.log(ordemData.customer[customerIndex].name);
 
-                console.log(ordemData.customer[customerIndex].name)
+                const dataUTMFbc = ordemData.customer[customerIndex].fbc || "";
+                const dataUTMFbp = ordemData.customer[customerIndex].fbp || "";
+                const dataUTMClientIp =
+                  ordemData.customer[customerIndex].client_ip_address || "";
+
+                /* Dados do BDA para evento */
+                const dataEmail = ordemData.customer[customerIndex].email || "";
+                const dataPhone =
+                  ordemData.customer[customerIndex].cellphone || "";
+                const dataName = ordemData.customer[customerIndex].name || "";
+                const dataLastName =
+                  ordemData.customer[customerIndex].name || "";
+
+                /* Dados complementares */
+                const dataGener =
+                  ordemData.customer[customerIndex].gener || "m";
+                const dataDateBorn =
+                  ordemData.customer[customerIndex].DateBorn || "";
+                const dataCodCEP = ordemData.customer[customerIndex].cep || "";
+                const dataStateOfCity =
+                  ordemData.customer[customerIndex].stateCity || "";
+                const dataCity = ordemData.customer[customerIndex].city || "";
+
+                /* Dados Produto relacionado ao usuário */
+                const dataProductValue =
+                  ordemData.customer[customerIndex].productValue || 10.0;
+
+
+                /* Dado montado para ativar o evento de purchase */
                 const dataEventPurchaseAction = {
-                  valueProduct: 10.0,
-                  customer: {
-                    name: ordemData.customer[customerIndex].name,
-                    email: ordemData.customer[customerIndex].email,
-                    cellphone: ordemData.customer[customerIndex].cellphone,
+                  dataPixesFacebook: dataFacebookTracking,
+                  dataCustomer: {
+                    name: dataName,
+                    email: dataEmail,
+                    cellphone: dataPhone,
+                    lastName: dataLastName,
+                    gener: dataGener,
+                    dateBorn: dataDateBorn,
+                    cep: dataCodCEP,
+                    stateOfCity: dataStateOfCity,
+                    city: dataCity,
                   },
-                  facebookTracking: dataFacebookTracking,
+
+                  dataUTM: {
+                    fbc: dataUTMFbc,
+                    fbp: dataUTMFbp,
+                    client_ip_address: dataUTMClientIp,
+                  },
+                  productValue: dataProductValue,
                 };
 
                 try {
-                  await EventsFacebookController.sendFacebookPurchaseEvent(
+                  await EventsFacebookController.eventPurchase(
                     dataEventPurchaseAction
                   );
                   console.log("Evento de compra enviado com sucesso!");
