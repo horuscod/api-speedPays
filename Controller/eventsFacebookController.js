@@ -93,42 +93,45 @@ const eventPurchase = async (data) => {
       const shouldSendEvent = pixel.status === "active";
       if (shouldSendEvent) {
         /* Convert datas in HASH-256 */
-        const hashName = crypto
-          .createHash("sha256")
-          .update(dataCustomer.name)
-          .digest("hex");
-        const hasEmail = crypto
-          .createHash("sha256")
-          .update(dataCustomer.email)
-          .digest("hex");
-        const hashPhone = crypto
-          .createHash("sha256")
-          .update(dataCustomer.cellphone)
-          .digest("hex");
-        const hashLastName = crypto
-          .createHash("sha256")
-          .update(dataCustomer.lastName)
-          .digest("hex");
-        const hashGener = crypto
-          .createHash("sha256")
-          .update(dataCustomer.gener)
-          .digest("hex");
-        const hashDateBorn = crypto
-          .createHash("sha256")
-          .update(dataCustomer.dateBorn)
-          .digest("hex");
-        const hashCodCEP = crypto
-          .createHash("sha256")
-          .update(dataCustomer.cep)
-          .digest("hex");
-        const hashStateOfCity = crypto
-          .createHash("sha256")
-          .update(dataCustomer.stateOfCity)
-          .digest("hex");
-        const hashCity = crypto
-          .createHash("sha256")
-          .update(dataCustomer.city)
-          .digest("hex");
+        const hashName = dataCustomer.name
+          ? crypto.createHash("sha256").update(dataCustomer.name).digest("hex")
+          : null;
+        const hasEmail = dataCustomer.email
+          ? crypto.createHash("sha256").update(dataCustomer.email).digest("hex")
+          : null;
+        const hashPhone = dataCustomer.cellphone
+          ? crypto
+              .createHash("sha256")
+              .update(dataCustomer.cellphone)
+              .digest("hex")
+          : null;
+        const hashLastName = dataCustomer.lastName
+          ? crypto
+              .createHash("sha256")
+              .update(dataCustomer.lastName)
+              .digest("hex")
+          : null;
+        const hashGener = dataCustomer.gener
+          ? crypto.createHash("sha256").update(dataCustomer.gener).digest("hex")
+          : null;
+        const hashDateBorn = dataCustomer.dateBorn
+          ? crypto
+              .createHash("sha256")
+              .update(dataCustomer.dateBorn)
+              .digest("hex")
+          : null;
+        const hashCodCEP = dataCustomer.cep
+          ? crypto.createHash("sha256").update(dataCustomer.cep).digest("hex")
+          : null;
+        const hashStateOfCity = dataCustomer.stateOfCity
+          ? crypto
+              .createHash("sha256")
+              .update(dataCustomer.stateOfCity)
+              .digest("hex")
+          : null;
+        const hashCity = dataCustomer.city
+          ? crypto.createHash("sha256").update(dataCustomer.city).digest("hex")
+          : null;
 
         const url = `https://graph.facebook.com/v16.0/${pixel.pixelID}/events?access_token=${pixel.tokenPixelID}`;
 
@@ -140,17 +143,17 @@ const eventPurchase = async (data) => {
               action_source: "website",
               content_type: "product",
               user_data: {
-                em: [hasEmail],
-                ph: [hashPhone],
-                fn: [hashName],
-                ge: [hashGener],
-                ln: [hashLastName],
-                db: [hashDateBorn],
-                zp: [hashCodCEP],
-                st: [hashStateOfCity],
-                ct: [hashCity],
-                fbc: dataUTM.fbc,
-                fbp: dataUTM.fbp,
+                em: hasEmail ? [hasEmail] : null,
+                ph: hashPhone ? [hashPhone] : null,
+                fn: hashName ? [hashName] : null,
+                ge: hashGener ? [hashGener] : null,
+                ln: hashLastName ? [hashLastName] : null,
+                db: hashDateBorn ? [hashDateBorn] : null,
+                zp: hashCodCEP ? [hashCodCEP] : null,
+                st: hashStateOfCity ? [hashStateOfCity] : null,
+                ct: hashCity ? [hashCity] : null,
+                fbc: dataUTM.fbc ? dataUTM.fbc : null,
+                fbp: dataUTM.fbp ? dataUTM.fbp : null,
                 client_ip_address: dataUTM.client_ip_address,
               },
               custom_data: {
@@ -202,42 +205,45 @@ const eventInitiateCheckout = async (dataCollection) => {
       const shouldSendEvent = pixel.status === "active";
 
       if (shouldSendEvent) {
-        const hashName = crypto
-          .createHash("sha256")
-          .update(dataCustomer.name)
-          .digest("hex");
-        const hasEmail = crypto
-          .createHash("sha256")
-          .update(dataCustomer.email)
-          .digest("hex");
-        const hashPhone = crypto
-          .createHash("sha256")
-          .update(dataCustomer.cellphone)
-          .digest("hex");
-        const hashLastName = crypto
-          .createHash("sha256")
-          .update(dataCustomer.lastName)
-          .digest("hex");
-        const hashGener = crypto
-          .createHash("sha256")
-          .update(dataCustomer.gener)
-          .digest("hex");
-        const hashDateBorn = crypto
-          .createHash("sha256")
-          .update(dataCustomer.dateBorn)
-          .digest("hex");
-        const hashCodCEP = crypto
-          .createHash("sha256")
-          .update(dataCustomer.cep)
-          .digest("hex");
-        const hashStateOfCity = crypto
-          .createHash("sha256")
-          .update(dataCustomer.stateOfCity)
-          .digest("hex");
-        const hashCity = crypto
-          .createHash("sha256")
-          .update(dataCustomer.city)
-          .digest("hex");
+        const hashName = dataCustomer.name
+          ? crypto.createHash("sha256").update(dataCustomer.name).digest("hex")
+          : null;
+        const hasEmail = dataCustomer.email
+          ? crypto.createHash("sha256").update(dataCustomer.email).digest("hex")
+          : null;
+        const hashPhone = dataCustomer.cellphone
+          ? crypto
+              .createHash("sha256")
+              .update(dataCustomer.cellphone)
+              .digest("hex")
+          : null;
+        const hashLastName = dataCustomer.lastName
+          ? crypto
+              .createHash("sha256")
+              .update(dataCustomer.lastName)
+              .digest("hex")
+          : null;
+        const hashGener = dataCustomer.gener
+          ? crypto.createHash("sha256").update(dataCustomer.gener).digest("hex")
+          : null;
+        const hashDateBorn = dataCustomer.dateBorn
+          ? crypto
+              .createHash("sha256")
+              .update(dataCustomer.dateBorn)
+              .digest("hex")
+          : null;
+        const hashCodCEP = dataCustomer.cep
+          ? crypto.createHash("sha256").update(dataCustomer.cep).digest("hex")
+          : null;
+        const hashStateOfCity = dataCustomer.stateOfCity
+          ? crypto
+              .createHash("sha256")
+              .update(dataCustomer.stateOfCity)
+              .digest("hex")
+          : null;
+        const hashCity = dataCustomer.city
+          ? crypto.createHash("sha256").update(dataCustomer.city).digest("hex")
+          : null;
 
         const url = `https://graph.facebook.com/v16.0/${pixel.pixelID}/events?access_token=${pixel.tokenPixelID}`;
 
@@ -249,17 +255,17 @@ const eventInitiateCheckout = async (dataCollection) => {
               action_source: "website",
               content_type: "product",
               user_data: {
-                em: [hasEmail],
-                ph: [hashPhone],
-                fn: [hashName],
-                ge: [hashGener],
-                ln: [hashLastName],
-                db: [hashDateBorn],
-                zp: [hashCodCEP],
-                st: [hashStateOfCity],
-                ct: [hashCity],
-                fbc: dataUTM.fbc,
-                fbp: dataUTM.fbp,
+                em: hasEmail ? [hasEmail] : null,
+                ph: hashPhone ? [hashPhone] : null,
+                fn: hashName ? [hashName] : null,
+                ge: hashGener ? [hashGener] : null,
+                ln: hashLastName ? [hashLastName] : null,
+                db: hashDateBorn ? [hashDateBorn] : null,
+                zp: hashCodCEP ? [hashCodCEP] : null,
+                st: hashStateOfCity ? [hashStateOfCity] : null,
+                ct: hashCity ? [hashCity] : null,
+                fbc: dataUTM.fbc ? dataUTM.fbc : null,
+                fbp: dataUTM.fbp ? dataUTM.fbp : null,
                 client_ip_address: dataUTM.client_ip_address,
               },
               custom_data: {
