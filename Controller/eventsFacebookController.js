@@ -58,7 +58,7 @@ const sendFacebookPurchaseEvent = async (dataUser) => {
                 em: hashEmail,
               },
               currency: "BRL",
-              fbc: "fb.1.1708049982830.567216466",
+              fbp: "fb.1.1708049982830.567216466",
               value: 10.0,
 
               custom_data: {
