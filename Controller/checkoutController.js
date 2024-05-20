@@ -63,15 +63,13 @@ const createNewClient = async (req, res) => {
     if (docUser.exists) {
       const dataUser = docUser.data();
       const UIDOrdens = dataUser.uidOrdensDocument;
-
       let typeBankData = dataUser.typeBankData;
       let activeBank = typeBankData.find((bank) => bank.active);
-
       let tokenArkama = dataUser.tokenArkama;
       if (
-        typeBank == "arkama" &&
-        typeBankData.name === "arkama" &&
-        typeBankData.active
+        activeBank &&
+        typeBank == activeBank.name &&
+        typeBank == "arkama" 
       ) {
         let dataCustomer = {
           tokenArkama: tokenArkama,
@@ -95,7 +93,6 @@ const createNewClient = async (req, res) => {
           ],
           ip: newCustomer.ip,
         };
-
         const CreateOrdemArkama = await ArkamaController.createNewOrderInArkama(
           dataCustomer
         );
