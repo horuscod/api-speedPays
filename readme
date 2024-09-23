@@ -1,4 +1,4 @@
-# API de Pagamentos via PIX com Integração HofficePay e Arkama
+#API de Pagamentos via PIX com Integração HofficePay e Arkama
 
 Este projeto é uma API desenvolvida em Node.js para criação e processamento de pagamentos via PIX. A API integra-se com duas fintechs, **HofficePay** e **Arkama**, e é responsável por gerenciar o ciclo completo de uma ordem de pagamento, desde a criação até a verificação de status e a integração com o **Facebook Ads** para otimização de dados de campanhas.
 
@@ -39,7 +39,7 @@ Este projeto é uma API desenvolvida em Node.js para criação e processamento d
 
 1. Clone o repositório:
     ```bash
-    git clone https://github.com/usuario/checkout-proprio.git
+    git clone https://github.com/horuscod/api-speedPays
     ```
 
 2. Instale as dependências:
