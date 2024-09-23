@@ -75,6 +75,9 @@ const sendFacebookPurchaseEvent = async (dataUser) => {
         } catch (error) {
           console.error("Error sending purchase event:", error.response.data);
         }
+      } else {
+        const message = "Ocorreu um erro verifica ai seus dados!";
+        return message;
       }
     }
   } catch (error) {
@@ -160,8 +163,8 @@ const eventPurchase = async (data) => {
                 currency: "BRL",
                 value: productValue,
                 client_ip_address: dataUTM.client_ip_address,
-                fbc: dataUTM.fbc,
-                fbp: dataUTM.fbp,
+                fbc: dataUTM.fbc ? dataUTM.fbc : null,
+                fbp: dataUTM.fbp ? dataUTM.fbp : null,
                 city: dataCustomer.city,
               },
             },
@@ -272,8 +275,8 @@ const eventInitiateCheckout = async (dataCollection) => {
                 currency: "BRL",
                 value: productValue,
                 client_ip_address: dataUTM.client_ip_address,
-                fbc: dataUTM.fbc,
-                fbp: dataUTM.fbp,
+                fbc: dataUTM.fbc ? dataUTM.fbc : null,
+                fbp: dataUTM.fbp ? dataUTM.fbp : null,
                 city: dataCustomer.city,
               },
             },

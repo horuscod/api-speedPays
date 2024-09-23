@@ -34,6 +34,63 @@ function gerarEmailAleatorio() {
   return email;
 }
 
+function alterarEmail(email) {
+  const dominios = ["@gmail.com", "@hotmail.com", "@outlook.com"];
+  const letras = "abcdefghijklmnopqrstuvwxyz";
+  const randomChoice = Math.random();
+  let [username, dominio] = email.split("@");
+
+  if (randomChoice < 0.5) {
+    // Trocar o domínio do e-mail
+    dominio = dominios[Math.floor(Math.random() * dominios.length)];
+    email = `${username}${dominio}`;
+  } else {
+    // Adicionar até 3 caracteres aleatórios ao nome do usuário
+    const numCaracteres = Math.floor(Math.random() * 4); // de 0 a 3 caracteres
+    for (let i = 0; i < numCaracteres; i++) {
+      username += letras.charAt(Math.floor(Math.random() * letras.length));
+    }
+    email = `${username}@${dominio}`;
+  }
+
+  return email;
+}
+
+/* Salvar Cliente no banco de dados */
+
+const saveNewClientInPlataform = async (dataClient) => {
+  try {
+    const { hashUser } = dataClient;
+    const docRef = db.collection("users").doc(hashUser);
+    const docUser = await docRef.get();
+    if (docUser.exists) {
+      const ordemData = docUser.data();
+      const UIDOrdens = ordemData.uidOrdensDocument;
+      const documentRef = db.collection("ordens").doc(UIDOrdens);
+
+      /* Dados do cliente simples */
+
+      const nameClient = dataClient.name;
+      const emailClient = dataClient.email;
+      const phoneClient = dataClient.phone;
+      const cpfClient = dataClient.cpf;
+      const IPClient = dataClient.client_ip_address;
+
+      /* Dados do usuário para salvar */
+
+      let client = {
+        name: nameClient ? nameClient : "",
+        email: emailClient ? emailClient : "",
+        phone: phoneClient ? phoneClient : "",
+        cpf: cpfClient ? cpfClient : "",
+        IP: IPClient ? IPClient : "",
+      };
+    }
+  } catch (error) {
+    return res.status(404).json(error);
+  }
+};
+
 const createNewClient = async (req, res) => {
   try {
     const {
@@ -66,11 +123,7 @@ const createNewClient = async (req, res) => {
       let typeBankData = dataUser.typeBankData;
       let activeBank = typeBankData.find((bank) => bank.active);
       let tokenArkama = dataUser.tokenArkama;
-      if (
-        activeBank &&
-        typeBank == activeBank.name &&
-        typeBank == "arkama" 
-      ) {
+      if (activeBank && typeBank == activeBank.name && typeBank == "arkama") {
         let dataCustomer = {
           tokenArkama: tokenArkama,
           customer: {
@@ -255,7 +308,6 @@ const createNewClient = async (req, res) => {
   }
 };
 
-
 /* Ativa já o evento de iniciação de checkout. Quando o checkout é criado */
 const createNewCheckout = async (req, res) => {
   try {
@@ -283,6 +335,18 @@ const createNewCheckout = async (req, res) => {
 
           if (customerData) {
             console.log(customerData);
+            /* Verifica se existe as informações do cliente de forma completa */
+            const lastName = customerData.lastName;
+            const gener = customerData.gener;
+            const dateBorn = customerData.dateBorn;
+            const cep = customerData.cep;
+            const stateOfCity = customerData.stateOfCity;
+            const city = customerData.city;
+
+            /* Verifica se existe FBC ou FBQ para otimizar o evento no Facebook */
+
+            const fbc = customerData.utms.fbc ? customerData.utms.fbc : null;
+            const fbq = customerData.utms.fbp ? customerData.utms.fbp : null;
 
             /* Acionar o PIXEL de iniciar checkout */
 
@@ -292,17 +356,17 @@ const createNewCheckout = async (req, res) => {
                 name: customerData.name,
                 email: customerData.email,
                 cellphone: `+${customerData.cellphone}`,
-                lastName: customerData.lastName,
-                gener: customerData.gener,
-                dateBorn: customerData.dateBorn,
-                cep: customerData.cep,
-                stateOfCity: customerData.stateOfCity,
-                city: customerData.city,
+                lastName: lastName ? lastName : "",
+                gener: gener ? gener : "",
+                dateBorn: dateBorn ? dateBorn : "",
+                cep: cep ? cep : "",
+                stateOfCity: stateOfCity ? stateOfCity : "",
+                city: city ? city : "",
               },
 
               dataUTM: {
-                fbc: customerData.utms.fbc ? customerData.utms.fbc : null,
-                fbp: customerData.utms.fbp ? customerData.utms.fbp : null,
+                fbc: fbc,
+                fbp: fbq,
                 client_ip_address: customerData.client_ip_address,
               },
               productValue: customerData.productValue,
@@ -393,4 +457,9 @@ const checkConfirmOrdemPAID = async (req, res) => {
   }
 };
 
-module.exports = { createNewCheckout, createNewClient, checkConfirmOrdemPAID };
+module.exports = {
+  createNewCheckout,
+  createNewClient,
+  checkConfirmOrdemPAID,
+  createSimpleNewClient,
+};

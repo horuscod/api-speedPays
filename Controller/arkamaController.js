@@ -2,45 +2,6 @@ const axios = require("axios");
 const admin = require("../firebaseConfig");
 const db = admin.firestore();
 
-const createNewOrderInArkama01 = async (req, res) => {
-  try {
-    const {
-      customer: { name, email, document, cellphone },
-      value,
-      paymentMethod,
-      items,
-    } = req.body;
-    const ipUser = req.ip;
-
-    const response = await axios.post(
-      "https://api.arkama.com.br/v1/orders?token=bAnRHpeWHy6oLoY4McaYsG9B7xWk47vPMIPQzn9qnLepDPc0cJnU4Wp75RMz",
-      {
-        customer: { name, email, document, cellphone },
-        value,
-        paymentMethod,
-        items,
-        ip: ipUser,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          accept: "application/json",
-        },
-      }
-    );
-
-    if (response.data && response.data.pix && response.data.pix.payload) {
-      const qrCodeUrl = await generateQRCode(response.data.pix.payload);
-      res.status(200).json({ message: "PIX CRIADO COM SUCESSO", qrCodeUrl });
-    } else {
-      res.status(400).json({ message: "Erro ao gerar PIX" });
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Erro interno do servidor" });
-  }
-};
-
 const createNewOrderInArkama = async (dataCustomer, res) => {
   try {
     let data = dataCustomer;
@@ -71,10 +32,6 @@ const createNewOrderInArkama = async (dataCustomer, res) => {
     res.status(500).json({ message: "Erro interno do servidor" });
   }
 };
-
-const verifyOrderStatusPIX = async (req, res) => {};
-
-const OrderPIXPaid = async (req, res) => {};
 
 const generateQRCode = async (payload) => {
   try {
@@ -171,9 +128,14 @@ const initSetupRuleArkama = async (req, res) => {
   }
 };
 
+/* New functions for developer to otimizate process */
+
+const verifyOrderStatusPIX = async (req, res) => {};
+
+const OrderPIXPaid = async (req, res) => {};
+
 module.exports = {
   createNewOrderInArkama,
-  createNewOrderInArkama01,
   postbackUpdateStatus,
   initSetupRuleArkama,
 };
