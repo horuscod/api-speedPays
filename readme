@@ -1,0 +1,82 @@
+# API de Pagamentos via PIX com Integração HofficePay e Arkama
+
+Este projeto é uma API desenvolvida em Node.js para criação e processamento de pagamentos via PIX. A API integra-se com duas fintechs, **HofficePay** e **Arkama**, e é responsável por gerenciar o ciclo completo de uma ordem de pagamento, desde a criação até a verificação de status e a integração com o **Facebook Ads** para otimização de dados de campanhas.
+
+## Funcionalidades
+
+- **Criação de ordem de compra**: Gera uma nova ordem de compra via PIX.
+- **Integração com Firebase**: Armazena dados dos consumidores e informações de tracking no Firestore.
+- **Verificação de status de pagamento**: Confirma se a compra foi aprovada ou está pendente.
+- **Reabertura de verificação de compra**: Caso o pagamento não tenha sido confirmado, o sistema permite a abertura de uma nova verificação.
+- **Retroalimentação para Facebook Ads**: Os dados de transações (iniciação de compra, pagamento PIX, compra aprovada) são enviados para otimizar o **Facebook Pixel**.
+- **Rate Limiting**: Limitação de requisições por IP, com uma lista branca de IPs isentos da limitação.
+  
+## Middlewares
+
+1. **Middleware de Verificação de Domínio**: Apenas requisições vindas do domínio `speedpays.com.br` podem criar ordens de pagamento.
+2. **Middleware para Integração com FlutterFlow**: Está em desenvolvimento a integração com a plataforma FlutterFlow para fornecer dados como SaaS. Esse middleware serve como base para essa integração.
+
+## Tecnologias Utilizadas
+
+- **Node.js**: Plataforma de desenvolvimento back-end.
+- **Express**: Framework web para criação da API.
+- **Firebase**: Firestore para armazenamento de dados de consumidores e tracking.
+- **Facebook Ads API**: Integração para envio de dados ao Pixel do Facebook.
+- **HofficePay & Arkama**: Fintechs integradas para o processamento dos pagamentos via PIX.
+
+## Dependências
+
+- `express`: Framework web para criar e gerenciar rotas da API.
+- `firebase-admin`: SDK para integração com Firebase e Firestore.
+- `axios`: Para realizar requisições HTTP para APIs externas.
+- `cors`: Habilita Cross-Origin Resource Sharing.
+- `dotenv`: Gerencia variáveis de ambiente.
+- `helmet`: Melhora a segurança das requisições HTTP.
+- `express-rate-limit`: Implementa a limitação de requisições para evitar abusos.
+- `api`: Para comunicação com serviços de terceiros.
+
+## Instalação
+
+1. Clone o repositório:
+    ```bash
+    git clone https://github.com/usuario/checkout-proprio.git
+    ```
+
+2. Instale as dependências:
+    ```bash
+    npm install
+    ```
+
+3. Configure o arquivo `.env` com suas variáveis de ambiente, como credenciais da Firebase e informações de integração com as fintechs HofficePay e Arkama.
+
+4. Inicie o servidor:
+    ```bash
+    npm start
+    ```
+
+## Uso
+
+Após configurar o ambiente, você poderá criar ordens de pagamento via requisições HTTP, que seguirão o seguinte fluxo:
+
+1. Criação de ordem de pagamento com dados do consumidor e da transação.
+2. Armazenamento dos dados no Firebase.
+3. Verificação de status (compra pendente ou aprovada).
+4. Retroalimentação de dados para o Facebook Ads para otimização de campanhas.
+
+## Considerações de Segurança
+
+- Apenas o domínio principal (`speedpays.com.br`) pode realizar operações críticas, como a criação de ordens de pagamento.
+- Limitação de requisições por IP com exceção para IPs na lista branca.
+- Todas as requisições são protegidas por `helmet` para reforçar a segurança.
+
+## Contribuição
+
+Se quiser contribuir para o desenvolvimento deste projeto, faça um fork do repositório e crie pull requests com suas sugestões ou correções.
+
+## Autor
+
+Desenvolvido por **Otávio Prosperus**.
+
+## Licença
+
+Este projeto está licenciado sob a licença **ISC**.
